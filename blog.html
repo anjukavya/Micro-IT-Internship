@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blog Website</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* Updated Header with Background Image */
+    header {
+      background: url('https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=1470&q=80') no-repeat center center/cover;
+      color: #fff;
+      text-align: center;
+      padding: 60px 20px;
+      position: relative;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      margin: 0;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+    }
+
+    header button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 8px 15px;
+      background-color: rgba(0,0,0,0.6);
+      border: none;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 0 15px;
+    }
+
+    h2, h3 {
+      margin: 0.5em 0;
+    }
+
+    .post {
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .post p {
+      margin: 0.5em 0;
+    }
+
+    .comment-box {
+      margin-top: 10px;
+    }
+
+    .comment {
+      font-size: 0.9em;
+      margin-left: 1em;
+      color: #555;
+    }
+
+    .form-group {
+      margin: 10px 0;
+    }
+
+    input, textarea, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+
+    button {
+      background: #222;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    .dark {
+      background: #121212;
+      color: #f5f5f5;
+    }
+
+    .dark .post {
+      background: #1e1e1e;
+      color: #ddd;
+    }
+
+    .filter, .new-post {
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 2rem;
+      }
+
+      header button {
+        top: 10px;
+        right: 10px;
+        padding: 6px 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📝 My Blog</h1>
+    <button onclick="toggleTheme()">🌓 Toggle Theme</button>
+  </header>
+
+  <div class="container">
+    <!-- Filter -->
+    <div class="filter">
+      <label for="categoryFilter">Filter by category:</label>
+      <select id="categoryFilter" onchange="filterPosts()">
+        <option value="all">All</option>
+        <option value="Tech">Tech</option>
+        <option value="Lifestyle">Lifestyle</option>
+        <option value="Education">Education</option>
+      </select>
+    </div>
+
+    <!-- New Post Form -->
+    <div class="new-post">
+      <h2>Add New Post</h2>
+      <div class="form-group">
+        <input type="text" id="title" placeholder="Post Title" />
+      </div>
+      <div class="form-group">
+        <textarea id="body" placeholder="Write your post..."></textarea>
+      </div>
+      <div class="form-group">
+        <select id="category">
+          <option value="Tech">Tech</option>
+          <option value="Lifestyle">Lifestyle</option>
+          <option value="Education">Education</option>
+        </select>
+      </div>
+      <button onclick="addPost()">Publish Post</button>
+    </div>
+
+    <!-- Blog Posts -->
+    <div id="postsContainer"></div>
+  </div>
+
+  <script>
+    let posts = [
+      {
+        title: "The Future of JavaScript",
+        body: "JavaScript continues to evolve with powerful frameworks...",
+        category: "Tech",
+        comments: []
+      },
+      {
+        title: "Healthy Lifestyle Tips",
+        body: "Maintaining a healthy lifestyle is important. Eat well, sleep enough...",
+        category: "Lifestyle",
+        comments: []
+      }
+    ];
+
+    function renderPosts(filtered = "all") {
+      const container = document.getElementById("postsContainer");
+      container.innerHTML = "";
+
+      posts.filter(post => filtered === "all" || post.category === filtered)
+        .forEach((post, index) => {
+          const div = document.createElement("div");
+          div.className = "post";
+          div.innerHTML = `
+            <h3>${post.title}</h3>
+            <p>${post.body}</p>
+            <p><strong>Category:</strong> ${post.category}</p>
+            <div class="comment-box">
+              <input type="text" id="comment-${index}" placeholder="Add a comment..." />
+              <button onclick="addComment(${index})">Comment</button>
+              <div id="comments-${index}">
+                ${post.comments.map(c => `<p class="comment">💬 ${c}</p>`).join("")}
+              </div>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+    }
+
+    function addPost() {
+      const title = document.getElementById("title").value.trim();
+      const body = document.getElementById("body").value.trim();
+      const category = document.getElementById("category").value;
+
+      if (!title || !body) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      posts.unshift({ title, body, category, comments: [] });
+      document.getElementById("title").value = "";
+      document.getElementById("body").value = "";
+      renderPosts(document.getElementById("categoryFilter").value);
+    }
+
+    function addComment(index) {
+      const input = document.getElementById(`comment-${index}`);
+      const comment = input.value.trim();
+      if (!comment) return;
+
+      posts[index].comments.push(comment);
+      input.value = "";
+      renderPosts(document.getElementById("categoryFilter").value);
+    }
+
+    function filterPosts() {
+      const category = document.getElementById("categoryFilter").value;
+      renderPosts(category);
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+    }
+
+    renderPosts();
+  </script>
+</body>
+</html>
