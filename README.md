@@ -1,6 +1,3 @@
-# Micro-IT-Internship
-
-
 # 🛍️ Pro E-Commerce
 
 **Pro E-Commerce** is a responsive and dynamic front-end e-commerce website built using HTML, CSS, and vanilla JavaScript. It includes core shopping functionalities like product browsing, filtering, cart management, and user interactions — all on a single page.
